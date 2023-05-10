@@ -10,8 +10,6 @@ import static ru.prudnikova.specs.Specs.responseSpec200;
 
 
 public class AuthorizationApi {
-    private String xsrfToken;
-    private String allureTestopsSession;
 
     public static String getXsrfToken() {
         open("https://allure.autotests.cloud/login");

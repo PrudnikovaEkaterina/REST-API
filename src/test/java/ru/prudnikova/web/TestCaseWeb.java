@@ -2,6 +2,7 @@ package ru.prudnikova.web;
 
 import com.codeborne.selenide.Condition;
 import org.openqa.selenium.Cookie;
+import ru.prudnikova.models.TestCaseModel;
 
 import static com.codeborne.selenide.Selenide.$x;
 import static com.codeborne.selenide.Selenide.open;
@@ -17,8 +18,8 @@ public class TestCaseWeb {
     getWebDriver().manage().addCookie(cookie1);
     }
 
-    public TestCaseWeb refactorDescription(int idTestCase, String description){
-        open("https://allure.autotests.cloud/project/2232/test-cases/"+idTestCase);
+    public TestCaseWeb refactorDescription(TestCaseModel responseCreateTestCase , String description){
+        open("https://allure.autotests.cloud/project/2232/test-cases/"+responseCreateTestCase.getId());
         $x("//div[text()='Description']//ancestor::section//descendant::button").click();
         $x("//textarea[@name='description']").setValue(description);
         $x("//span[text()='Submit']").click();

@@ -1,4 +1,4 @@
-package generators;
+package ru.prudnikova.generators;
 
 import com.github.javafaker.Faker;
 import ru.prudnikova.models.TestCaseModel;

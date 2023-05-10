@@ -1,5 +1,6 @@
 package ru.prudnikova.tests;
 
+import groovy.util.MapEntry;
 import io.qameta.allure.Owner;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.*;
@@ -14,10 +15,13 @@ import ru.prudnikova.web.TestCaseWeb;
 
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
+import static java.util.Map.Entry.*;
+import static javax.swing.UIManager.get;
 import static org.hamcrest.Matchers.*;
 import static ru.prudnikova.specs.Specs.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -136,26 +140,53 @@ public class AllureTest {
         set2=response.getData().get(2).getOffers().stream().map(el->el.getMove_newbuilding_secondary_id()).collect(Collectors.toSet());
         set3=response.getData().get(3).getOffers().stream().map(el->el.getMove_newbuilding_secondary_id()).collect(Collectors.toSet());
         set4=response.getData().get(4).getOffers().stream().map(el->el.getMove_newbuilding_secondary_id()).collect(Collectors.toSet());
+
         System.out.println(set0.size()+set1.size()+set2.size()+set3.size()+set4.size());
 
-        System.out.println(list0.size());
-        System.out.println(set0.size());
 
-
-        HashMap<String, Integer> map = new HashMap<>();
-        for (Map.Entry<String, Integer> entry: map.entrySet()){
-        int count=1;
-        if (map.containsKey(list0.get()))
-            map.put(line, (map.get(line)+1));
-        else
-            map.put(line, count))};
-
-
+       countIdAndFilteredMapWhereIdNotUnique(list0);
+        System.out.println();
+        countIdAndFilteredMapWhereIdNotUnique(list1);
+        System.out.println();
+        countIdAndFilteredMapWhereIdNotUnique(list2);
+        System.out.println();
+        countIdAndFilteredMapWhereIdNotUnique(list3);
+        System.out.println();
+        countIdAndFilteredMapWhereIdNotUnique(list4); //только уникальные
 
 
 
     }
 
-
-
+    public static Map<String, Integer> countId( List<String> list){
+        Map<String, Integer> map = new HashMap<>();
+        for (int i=0; i<list.size(); i++){
+            int count=1;
+            if (map.containsKey(list.get(i)))
+                map.put(list.get(i), (map.get(list.get(i))+1));
+            else
+                map.put(list.get(i), count);
+        }
+        return map;
+    }
+    public static Map<String, Integer> filteredMapWhereIdNotUnique( HashMap<String, Integer> map){
+        Map<String, Integer> filteredMap =map.entrySet().stream()
+                .filter(entry -> entry.getValue() > 1)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return filteredMap;
+    }
+    public static Map<String, Integer> countIdAndFilteredMapWhereIdNotUnique( List<String> list){
+        Map<String, Integer> map = new HashMap<>();
+        for (int i=0; i<list.size(); i++){
+            int count=1;
+            if (map.containsKey(list.get(i)))
+                map.put(list.get(i), (map.get(list.get(i))+1));
+            else
+                map.put(list.get(i), count);
+        }
+        Map<String, Integer> filteredMap =map.entrySet().stream()
+                .filter(entry -> entry.getValue() > 1)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        filteredMap.entrySet().stream().forEach(e -> System.out.print(e.getKey() + " - " + e.getValue()+" "));
+        return filteredMap;}
 }

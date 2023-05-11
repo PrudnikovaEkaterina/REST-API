@@ -40,7 +40,8 @@ dependencies {
             'com.github.javafaker:javafaker:1.0.2',
             "io.qameta.allure:allure-rest-assured:$allureVersion",
             "org.assertj:assertj-core:3.24.2",
-            'com.codeborne:selenide-proxy:6.13.1'
+            'com.codeborne:selenide-proxy:6.13.1',
+            'mysql:mysql-connector-java:8.0.32'
     )
 }
 

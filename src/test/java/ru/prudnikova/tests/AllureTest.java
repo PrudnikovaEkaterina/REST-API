@@ -1,11 +1,11 @@
 package ru.prudnikova.tests;
 
-import groovy.util.MapEntry;
 import io.qameta.allure.Owner;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.*;
 import ru.prudnikova.api.AuthorizationApi;
 import ru.prudnikova.api.TestCaseApi;
+import ru.prudnikova.dataBase.DataSourceProvider;
 import ru.prudnikova.generators.DescriptionGenerator;
 import ru.prudnikova.models.DeleteTestCaseModel;
 import ru.prudnikova.models.scenario.Scenario;
@@ -14,19 +14,24 @@ import ru.prudnikova.models.work.Data;
 import ru.prudnikova.web.TestCaseWeb;
 
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
-import static java.util.Map.Entry.*;
 import static javax.swing.UIManager.get;
 import static org.hamcrest.Matchers.*;
 import static ru.prudnikova.specs.Specs.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class AllureTest {
+   private DataSource ds = DataSourceProvider.INSTANCE.getDataSource();
+
     @Owner("Prudnikova")
     @Tags({@Tag("Api"), @Tag("Web")})
     @DisplayName("Создание тест кейса по апи и редактирование его в браузере")
@@ -189,4 +194,27 @@ public class AllureTest {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         filteredMap.entrySet().stream().forEach(e -> System.out.print(e.getKey() + " - " + e.getValue()+" "));
         return filteredMap;}
-}
+
+    @Test
+    void bd(){
+
+        String phone="19419009781";
+        String result=null;
+        try (Connection connection = ds.getConnection();
+             PreparedStatement ps = connection.prepareStatement(
+                     "select name from users where phone = ?"
+             )) {
+            ps.setString(1, phone);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                result= resultSet.getString("name");
+            }
+            System.out.println(result);
+            Assertions.assertEquals("Прудникова Selenide", result);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    }
+

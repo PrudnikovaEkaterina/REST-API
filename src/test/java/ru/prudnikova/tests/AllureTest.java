@@ -1,11 +1,14 @@
 package ru.prudnikova.tests;
 
+import com.codeborne.selenide.Condition;
 import io.qameta.allure.Owner;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.*;
 import ru.prudnikova.api.AuthorizationApi;
 import ru.prudnikova.api.TestCaseApi;
+import ru.prudnikova.dataBase.CallbackPhonesManager;
 import ru.prudnikova.dataBase.DataSourceProvider;
+import ru.prudnikova.domain.CallbackPhonesBD;
 import ru.prudnikova.generators.DescriptionGenerator;
 import ru.prudnikova.models.DeleteTestCaseModel;
 import ru.prudnikova.models.scenario.Scenario;
@@ -22,6 +25,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.codeborne.selenide.Selenide.*;
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 import static javax.swing.UIManager.get;
@@ -30,7 +34,8 @@ import static ru.prudnikova.specs.Specs.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class AllureTest {
-   private DataSource ds = DataSourceProvider.INSTANCE.getDataSource();
+    private DataSource ds = DataSourceProvider.INSTANCE.getDataSource();
+    CallbackPhonesManager callbackPhonesManager=new CallbackPhonesManager();
 
     @Owner("Prudnikova")
     @Tags({@Tag("Api"), @Tag("Web")})
@@ -215,6 +220,91 @@ public class AllureTest {
             e.printStackTrace();
         }
     }
+    @Test
+    void bd1(){
+        String phone="75555555999";
+        open("https://novo-estate.ru/");
+        $x("//input[@name='phone']").setValue(phone);
+        $(".one-column-callback__call-me").shouldBe(Condition.enabled).click();
+        $(".phone-thanks-modal__title").shouldHave(Condition.text("Мы уже обрабатываем вашу заявку"));
+        String result =callbackPhonesManager.selectLastEntryPhoneFromCallbackPhonesTables();
+        Assertions.assertEquals(phone, result);
+    }
+
+    @Test
+    void bd2(){
+        String phone="75555555978";
+        open("https://novo-estate.ru/");
+        $x("//input[@name='phone']").setValue(phone);
+        $(".one-column-callback__call-me").shouldBe(Condition.enabled).click();
+        $(".phone-thanks-modal__title").shouldHave(Condition.text("Мы уже обрабатываем вашу заявку"));
+        CallbackPhonesBD result;
+        result =callbackPhonesManager.selectLastEntryFromCallbackPhonesTables();
+        Assertions.assertEquals(phone, result.getPhone());
+        Assertions.assertEquals("https://novo-estate.ru/", result.getLink());
+    }
+//    public int createOwner(Owner owner) {
+//		try (Connection connection = ds.getConnection();
+//			 PreparedStatement ps = connection.prepareStatement(
+//				 "INSERT INTO owners (first_name, last_name, address, city, telephone)\n" +
+//					 "VALUES (?, ?, ?, ?, ?)",
+//				 Statement.RETURN_GENERATED_KEYS
+//			 )) {
+//			ps.setString(1, owner.getFirstName());
+//			ps.setString(2, owner.getLastName());
+//			ps.setString(3, owner.getAddress());
+//			ps.setString(4, owner.getCity());
+//			ps.setString(5, owner.getTelephone());
+//			ps.executeUpdate();
+//
+//			ResultSet generatedKeys = ps.getGeneratedKeys();
+//			if (generatedKeys.next()) {
+//				return generatedKeys.getInt(1);
+//			}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		return -1;
+//	}
+//
+//	@Override
+//	public void deleteOwner(int id) {
+//		try (Connection connection = ds.getConnection();
+//			 PreparedStatement ps = connection.prepareStatement(
+//				 "DELETE FROM owners WHERE id = ?"
+//			 )) {
+//			ps.setInt(1, id);
+//			ps.executeUpdate();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//	}
+//
+//	@Override
+//	public List<Owner> findByLastName(String lastName) {
+//		List<Owner> result = new ArrayList<>();
+//
+//		try (Connection connection = ds.getConnection();
+//			 PreparedStatement ps = connection.prepareStatement(
+//				 "SELECT * FROM owners WHERE last_name = ?"
+//			 )) {
+//			ps.setString(1, lastName);
+//			ResultSet resultSet = ps.executeQuery();
+//			while (resultSet.next()) {
+//				result.add(Owner.builder()
+//					.firstName(resultSet.getString("first_name"))
+//					.lastName(resultSet.getString("last_name"))
+//					.address(resultSet.getString("address"))
+//					.city(resultSet.getString("city"))
+//					.telephone(resultSet.getString("telephone"))
+//					.build());
+//			}
+//			return result;
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		return Collections.emptyList();
+//	}
 
     }
 

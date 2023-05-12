@@ -41,8 +41,11 @@ dependencies {
             "io.qameta.allure:allure-rest-assured:$allureVersion",
             "org.assertj:assertj-core:3.24.2",
             'com.codeborne:selenide-proxy:6.13.1',
-            'mysql:mysql-connector-java:8.0.32', //подключаем интерфейс mysql, чистый JDBC
-            'org.springframework:spring-jdbc:6.0.7' // springframework для удобной работы с БД
+            'mysql:mysql-connector-java:8.0.32',
+            'org.springframework:spring-jdbc:6.0.7',
+            'org.springframework.boot:spring-boot-starter-jdbc:3.0.6'
+            //подключаем интерфейс mysql, чистый JDBC
+           // springframework для удобной работы с БД
     )
 }
 

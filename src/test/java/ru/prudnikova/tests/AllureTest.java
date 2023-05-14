@@ -7,15 +7,15 @@ import org.junit.jupiter.api.*;
 import ru.prudnikova.api.AuthorizationApi;
 import ru.prudnikova.api.TestCaseApi;
 import ru.prudnikova.dataBase.CallbackPhonesManager;
+import ru.prudnikova.dataBase.CallbackPhonesManagerSpring;
 import ru.prudnikova.dataBase.DataSourceProvider;
 import ru.prudnikova.domain.CallbackPhonesBD;
 import ru.prudnikova.generators.DescriptionGenerator;
 import ru.prudnikova.models.DeleteTestCaseModel;
-import ru.prudnikova.models.scenario.Scenario;
 import ru.prudnikova.models.TestCaseModel;
+import ru.prudnikova.models.scenario.Scenario;
 import ru.prudnikova.models.work.Data;
 import ru.prudnikova.web.TestCaseWeb;
-
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -28,10 +28,10 @@ import java.util.stream.Collectors;
 import static com.codeborne.selenide.Selenide.*;
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
-import static javax.swing.UIManager.get;
-import static org.hamcrest.Matchers.*;
-import static ru.prudnikova.specs.Specs.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static ru.prudnikova.specs.Specs.requestSpecJson;
+import static ru.prudnikova.specs.Specs.responseSpec200;
 
 public class AllureTest {
     private DataSource ds = DataSourceProvider.INSTANCE.getDataSource();
@@ -305,6 +305,30 @@ public class AllureTest {
 //		}
 //		return Collections.emptyList();
 //	}
+    CallbackPhonesManagerSpring spring=new CallbackPhonesManagerSpring();
+
+    @Test
+    void bd5(){
+        String phone="75555555990";
+        open("https://novo-estate.ru/");
+        $x("//input[@name='phone']").setValue(phone);
+        $(".one-column-callback__call-me").shouldBe(Condition.enabled).click();
+        $(".phone-thanks-modal__title").shouldHave(Condition.text("Мы уже обрабатываем вашу заявку"));
+        String result =spring.selectLastEntryPhoneFromCallbackPhonesTables();
+        System.out.println(result);
+        Assertions.assertEquals(phone, result);
+    }
+    @Test
+    void bd6(){
+        String phone="75555555978";
+        open("https://novo-estate.ru/");
+        $x("//input[@name='phone']").setValue(phone);
+        $(".one-column-callback__call-me").shouldBe(Condition.enabled).click();
+        $(".phone-thanks-modal__title").shouldHave(Condition.text("Мы уже обрабатываем вашу заявку"));
+        List <CallbackPhonesBD> result =spring.selectLastEntryFromCallbackPhonesTables();
+        Assertions.assertEquals(phone, result.get(0).getPhone());
+        Assertions.assertEquals("https://novo-estate.ru/", result.get(0).getLink());
+    }
 
     }
 
